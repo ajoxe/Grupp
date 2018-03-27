@@ -13,11 +13,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.example.c4q.capstone.utils.Constants.EVENTS;
 import static com.example.c4q.capstone.utils.Constants.PUBLIC_USER;
+import static com.example.c4q.capstone.utils.Constants.USER_EVENTS;
 
 /**
  * Created by amirahoxendine on 3/26/18.
@@ -27,6 +30,7 @@ public class CurrentUserPostUtility {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference firebaseDatabase;
     private DatabaseReference userEventsReference;
+    private DatabaseReference preferencesReference;
     private DatabaseReference eventsReference;
     CurrentUser currentUser = CurrentUser.getInstance();
     private static final String TAG = "PostUtility";
@@ -34,8 +38,9 @@ public class CurrentUserPostUtility {
     public CurrentUserPostUtility(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase = mFirebaseDatabase.getReference();
-        userEventsReference = firebaseDatabase.child("user_events");
+        userEventsReference = firebaseDatabase.child(USER_EVENTS);
         eventsReference = firebaseDatabase.child(EVENTS);
+        preferencesReference = firebaseDatabase.child(PUBLIC_USER).child(CurrentUser.getInstance().getUserID());
     }
 
     public String getNewEventKey(){
@@ -53,6 +58,10 @@ public class CurrentUserPostUtility {
             userEventKeys = new ArrayList<>();
         }
         userEventKeys.add(key);
+        Set<String> eventKeys = new HashSet<>();
+        eventKeys.addAll(userEventKeys);
+        userEventKeys = new ArrayList<>();
+        userEventKeys.addAll(eventKeys);
         Map<String, Object> user_events = new HashMap<>();
         user_events.put(currentUser.getUserID(), userEventKeys);
         userEventsReference.updateChildren(user_events);
@@ -85,5 +94,15 @@ public class CurrentUserPostUtility {
         firebaseDatabase.child(PUBLIC_USER).addValueEventListener(userListener);
     }
 
+    public void updateBarPrefs(List<String> barPrefs){
+        Map<String, Object> userPrefs = new HashMap<>();
+        userPrefs.put("bar_preferences", barPrefs);
+        preferencesReference.updateChildren(userPrefs);
+    }
 
+    public void updateResPrefs(List<String> resPrefs){
+        Map<String, Object> userPrefs = new HashMap<>();
+        userPrefs.put("restaurant_preferences", resPrefs);
+        preferencesReference.updateChildren(userPrefs);
+    }
 }
