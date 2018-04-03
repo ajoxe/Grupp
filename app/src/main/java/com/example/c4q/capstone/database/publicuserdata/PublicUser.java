@@ -1,6 +1,8 @@
 package com.example.c4q.capstone.database.publicuserdata;
 
 
+import java.util.List;
+
 public class PublicUser {
     private String user_id;
     private String first_name;
@@ -8,23 +10,50 @@ public class PublicUser {
     private String zip_code;
     private String budget;
     private String email;
+    private UserIcon user_icon;
     private boolean over_18;
     private boolean over_21;
     private int radius;
+    private List<String> user_preferences;
+    private List<String> pending_request;
 
     public PublicUser() {
     }
 
     public PublicUser(String user_id, String first_name, String last_name, String zip_code, String budget, String email, boolean over_18, boolean over_21, int radius) {
+        this.user_id = user_id;
         this.first_name = first_name;
         this.last_name = last_name;
         this.zip_code = zip_code;
-        this.user_id = user_id;
         this.budget = budget;
         this.email = email;
         this.over_18 = over_18;
         this.over_21 = over_21;
         this.radius = radius;
+    }
+
+    public UserIcon getUser_icon() {
+        return user_icon;
+    }
+
+    public void setUser_icon(UserIcon user_icon) {
+        this.user_icon = user_icon;
+    }
+
+    public List<String> getPending_request() {
+        return pending_request;
+    }
+
+    public void setPending_request(List<String> pending_request) {
+        this.pending_request = pending_request;
+    }
+
+    public List<String> getUser_preferences() {
+        return user_preferences;
+    }
+
+    public void setUser_preferences(List<String> user_preferences) {
+        this.user_preferences = user_preferences;
     }
 
     public String getUser_id() {

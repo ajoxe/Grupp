@@ -3,7 +3,6 @@ package com.example.c4q.capstone.userinterface.user;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -15,13 +14,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.example.c4q.capstone.R;
 import com.example.c4q.capstone.database.privateuserdata.PrivateUser;
 import com.example.c4q.capstone.database.privateuserdata.PrivateUserLocation;
 import com.example.c4q.capstone.database.publicuserdata.PublicUser;
-import com.example.c4q.capstone.database.publicuserdata.UserSearch;
+import com.example.c4q.capstone.database.publicuserdata.PublicUserDetails;
+import com.example.c4q.capstone.database.publicuserdata.UserIcon;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,12 +32,12 @@ import com.google.firebase.database.ValueEventListener;
 import static com.example.c4q.capstone.utils.Constants.PRIVATE_LOCATION;
 import static com.example.c4q.capstone.utils.Constants.PRIVATE_USER;
 import static com.example.c4q.capstone.utils.Constants.PUBLIC_USER;
-import static com.example.c4q.capstone.utils.Constants.USER_SEARCH;
+import static com.example.c4q.capstone.utils.Constants.USER_ICON;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
 
-    private String currentUserID, firstNameString, lastNameString, zipCodeSting, budgetString;
+    private String currentUserID, firstNameString, lastNameString, zipCodeString, budgetString;
     private boolean over18, over21, share_location;
     private int radius;
     private double lat, lng;
@@ -50,13 +49,14 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseReference rootRef, publicUserReference, privateUserReference, privateUserLocationReference, searchUserReference;
+    private DatabaseReference rootRef, publicUserReference, privateUserReference, privateUserLocationReference, userIconReference;
     private FirebaseUser currentUser;
-    private UserSearch userSearch;
     private PublicUser publicUser;
     private PrivateUser privateUser;
+    private UserIcon userIcon;
+    private PublicUserDetails publicUserDetails;
     private PrivateUserLocation privateUserLocation;
-    private String currentUserEmail;
+    private String currentUserEmail, iconUrl;
 
 
     @Override
@@ -80,11 +80,12 @@ public class EditProfileActivity extends AppCompatActivity {
         publicUserReference = rootRef.child(PUBLIC_USER);
         privateUserReference = rootRef.child(PRIVATE_USER);
         privateUserLocationReference = rootRef.child(PRIVATE_USER);
-        searchUserReference = rootRef.child(USER_SEARCH);
+        userIconReference = rootRef.child(USER_ICON);
 
         currentUser = mAuth.getCurrentUser();
         currentUserID = currentUser.getUid();
         currentUserEmail = currentUser.getEmail();
+
 
         radioGroupSelection();
 
@@ -109,7 +110,9 @@ public class EditProfileActivity extends AppCompatActivity {
                 privateUser = dataSnapshot.child(currentUserID).getValue(PrivateUser.class);
                 privateUserLocation = dataSnapshot.child(currentUserID).getValue(PrivateUserLocation.class);
                 publicUser = dataSnapshot.child(currentUserID).getValue(PublicUser.class);
-                userSearch = dataSnapshot.child(currentUserID).getValue(UserSearch.class);
+                userIcon = dataSnapshot.child(currentUserID).getValue(UserIcon.class);
+
+                iconUrl = userIcon.getIcon_url();
 
                 Log.d(TAG, "onDataChange: Added information to database: \n" + dataSnapshot.getValue());
             }
@@ -121,10 +124,10 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         };
 
-        searchUserReference.addValueEventListener(valueEventListener);
         publicUserReference.addValueEventListener(valueEventListener);
         privateUserReference.addValueEventListener(valueEventListener);
         privateUserLocationReference.addValueEventListener(valueEventListener);
+        userIconReference.addListenerForSingleValueEvent(valueEventListener);
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,24 +162,31 @@ public class EditProfileActivity extends AppCompatActivity {
     private void saveToDatabase() {
         firstNameString = firstName.getText().toString().trim();
         lastNameString = lastName.getText().toString().trim();
-        zipCodeSting = zipCode.getText().toString();
+        zipCodeString = zipCode.getText().toString();
 
-        if (!firstNameString.equals("") && !lastNameString.equals("") && !zipCodeSting.equals("")) {
+        if (!firstNameString.equals("") && !lastNameString.equals("") && !zipCodeString.equals("")) {
 
-            publicUser = new PublicUser(currentUserID,firstNameString, lastNameString, zipCodeSting, budgetString, currentUserEmail, over18, over21, radius);
+
+            publicUser = new PublicUser(currentUserID, firstNameString, lastNameString, zipCodeString, budgetString, currentUserEmail, over18, over21, radius);
+
             privateUser = new PrivateUser(firstNameString, lastNameString, over18, over21, radius);
+
             privateUserLocation = new PrivateUserLocation(share_location, lat, lng);
-            userSearch = new UserSearch(currentUserEmail);
+
+            //will cause a nullPointerException, to be fixed
+            userIcon = new UserIcon(iconUrl);
 
             /**
              * searchUserReference needs to be added at time of account creation
              */
-            searchUserReference.child(currentUserID).setValue(userSearch);
+
             publicUserReference.child(currentUserID).setValue(publicUser);
             privateUserReference.child(currentUserID).setValue(privateUser);
+            userIconReference.child(currentUserID).setValue(userIcon);
             privateUserLocationReference.child(currentUserID).child(PRIVATE_LOCATION).setValue(privateUserLocation);
 
             startActivity(new Intent(EditProfileActivity.this, UserProfileActivity.class));
+
         } else {
             firstName.setError("Required");
             lastName.setError("Required");
