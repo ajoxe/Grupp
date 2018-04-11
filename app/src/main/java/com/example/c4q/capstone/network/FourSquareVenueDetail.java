@@ -12,6 +12,24 @@ public class FourSquareVenueDetail {
     String url;
     BestPhoto bestPhoto;
     Location location;
+    float rating;
+    String description;
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getId() {
         return id;
