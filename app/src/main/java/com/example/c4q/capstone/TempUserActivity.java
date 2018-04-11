@@ -6,13 +6,23 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.c4q.capstone.database.privateuserdata.PrivateUser;
+import com.example.c4q.capstone.database.privateuserdata.UserPreferences;
 import com.example.c4q.capstone.database.publicuserdata.PublicUser;
 import com.example.c4q.capstone.database.publicuserdata.UserIcon;
 import com.example.c4q.capstone.userinterface.CurrentUserPost;
+import com.example.c4q.capstone.userinterface.events.EventInviteActivity;
+import com.example.c4q.capstone.userinterface.user.EditProfileActivity;
+import com.example.c4q.capstone.userinterface.user.onboarding.CreateProfileFragment;
+import com.example.c4q.capstone.userinterface.user.onboarding.OnBoardActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,8 +38,16 @@ import com.google.firebase.storage.UploadTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.c4q.capstone.utils.Constants.BEACH_ICON;
+import static com.example.c4q.capstone.utils.Constants.BEER_ICON;
+import static com.example.c4q.capstone.utils.Constants.COCKTAIL_ICON;
 import static com.example.c4q.capstone.utils.Constants.DEFAULT_ICON;
+import static com.example.c4q.capstone.utils.Constants.HOTEL_BAR_ICON;
+import static com.example.c4q.capstone.utils.Constants.KARAOKE_ICON;
+import static com.example.c4q.capstone.utils.Constants.PREFERENCES;
+import static com.example.c4q.capstone.utils.Constants.PRIVATE_USER;
 import static com.example.c4q.capstone.utils.Constants.PUBLIC_USER;
+import static com.example.c4q.capstone.utils.Constants.PUB_ICON;
 import static com.example.c4q.capstone.utils.Constants.USER_ICON;
 
 /**
@@ -41,11 +59,13 @@ public class TempUserActivity extends AppCompatActivity {
     private static final int IMG_PICKER_GALLERY = 1;
 
     private CircleImageView profilePic;
+    private ImageView editPreferencesButton;
     private TextView personName;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private String currentUserId;
     private DatabaseReference rootRef, userRef, iconRef;
+    private ImageView editProfileBtn, alertBtn;
 
 
     @Override
@@ -56,11 +76,38 @@ public class TempUserActivity extends AppCompatActivity {
         firebaseUser = mAuth.getCurrentUser();
         currentUserId = firebaseUser.getUid();
 
+        alertBtn = findViewById(R.id.event_invite_button);
+        alertBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TempUserActivity.this, EventInviteActivity.class));
+            }
+        });
+        editPreferencesButton = findViewById(R.id.edit_pref_button);
+
+        editPreferencesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //startActivity(new Intent(TempUserActivity.this, OnBoardActivity.class));
+                startActivity(new Intent(TempUserActivity.this, EditProfileActivity.class));
+
+            }
+        });
+
         rootRef = FirebaseDatabase.getInstance().getReference();
         userRef = rootRef.child(PUBLIC_USER).child(currentUserId);
         iconRef = rootRef.child(USER_ICON).child(currentUserId);
+
         profilePic = findViewById(R.id.circle_imageview);
         personName = findViewById(R.id.user_name);
+
+        editProfileBtn = findViewById(R.id.edit_profile_button);
+        editProfileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TempUserActivity.this, CreateProfileFragment.class));
+            }
+        });
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override

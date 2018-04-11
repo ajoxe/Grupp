@@ -13,6 +13,7 @@ import com.example.c4q.capstone.TempUserActivity;
 import com.example.c4q.capstone.database.events.EventGuest;
 import com.example.c4q.capstone.database.events.Events;
 import com.example.c4q.capstone.database.events.Venue;
+import com.example.c4q.capstone.userinterface.CurrentUserPost;
 import com.example.c4q.capstone.userinterface.alerts.InviteNotifications;
 import com.example.c4q.capstone.userinterface.user.MainProfileFragment;
 
@@ -61,9 +62,10 @@ public class VenueVoteUtility {
             if (!guest.isVoted()) {
                 return false;
             }
-
-
         }
+
+       InviteNotifications inviteNotifications = new InviteNotifications(context);
+        inviteNotifications.showNotificationVoteComplete(event.getEvent_id());
 
         return true;
     }
@@ -128,6 +130,7 @@ public class VenueVoteUtility {
         //
         // orderedVenueList.set(i, venueIdMap.get(topVenueId));
         topVenue = orderedVenueList.get(0);
+        CurrentUserPost.getInstance().postTopVenue(event.getEvent_id(), topVenue.getVenue_id(), topVenue.getVenue_photo_url(), event);
         return orderedVenueIdList;
     }
 

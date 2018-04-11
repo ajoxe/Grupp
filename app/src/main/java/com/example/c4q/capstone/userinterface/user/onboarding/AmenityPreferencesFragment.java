@@ -78,6 +78,8 @@ public class AmenityPreferencesFragment extends Fragment {
 
         saveButton = rootView.findViewById(R.id.amenity_pref_save_button);
 
+        saveToDatabase();
+
 
         prefs.put(brunch, "brunch");
         prefs.put(outdoorSeating, "outdoor+seating");
@@ -108,18 +110,17 @@ public class AmenityPreferencesFragment extends Fragment {
                 });
 
         }
-        saveToDatabase();
+
         return rootView;
     }
 
     public void saveToDatabase() {
 
-
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                preferencesDB.child(PUBLIC_USER).child(currentUserID).child(PREFERENCES).child(AMENITY_PREFS).setValue(selectedPrefs);
-                preferencesDB.child(PRIVATE_USER).child(currentUserID).child(PREFERENCES).child(AMENITY_PREFS).setValue(selectedPrefs);
+                preferencesDB.child(currentUserID).child(PREFERENCES).child(AMENITY_PREFS).setValue(selectedPrefs);
+                preferencesDB.child(currentUserID).child(PREFERENCES).child(AMENITY_PREFS).setValue(selectedPrefs);
                 CurrentUserPost.getInstance().postNewAmenityPreferences(selectedPrefs);
                 Intent intent = new Intent(getActivity(), UserProfileActivity.class);
                 startActivity(intent);

@@ -61,11 +61,12 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        saveBtn = findViewById(R.id.edit_profile_save_button);
+//        saveBtn = findViewById(R.id.edit_profile_save_button);
 
         ageGroup = findViewById(R.id.radio_group_age);
         budgetGroup = findViewById(R.id.radio_group_budget);
         radiusGroup = findViewById(R.id.radio_group_radius);
+        saveBtn = findViewById(R.id.edit_profile_save_button);
 
         firstName = findViewById(R.id.edit_profile_firstname);
         lastName = findViewById(R.id.edit_profile_lastname);
@@ -83,6 +84,9 @@ public class EditProfileActivity extends AppCompatActivity {
         currentUserID = currentUser.getUid();
         currentUserEmail = currentUser.getEmail();
 
+        /**
+         * write code to check if user exists in contact list of other users and then update the code
+         */
 
         radioGroupSelection();
 //
@@ -139,15 +143,8 @@ public class EditProfileActivity extends AppCompatActivity {
          * permission beforehand.
          */
         LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        share_location = true;
 
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1020);
-            share_location = true;
-            return;
-        }
 
        /* Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         lat = location.getLatitude();

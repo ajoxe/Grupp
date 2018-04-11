@@ -5,45 +5,40 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/friendsgray"
+    android:background="@drawable/peachfriends"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context="com.example.c4q.capstone.LoginActivity">
 
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="267dp"
-        android:src="@drawable/ic_grupp_logo_600dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Email Label -->
+    <!-- Email Label -->
 
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/google_button"
-        android:layout_width="280dp"
+        android:layout_width="220dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="60dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="92dp"
+        android:layout_marginStart="92dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintStart_toStartOf="parent">
 
-        <!--</com.google.android.gms.common.SignInButton>-->
+    </com.google.android.gms.common.SignInButton>
 
+    <ImageView
+        android:layout_width="184dp"
+        android:layout_height="240dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginEnd="100dp"
+        android:layout_marginTop="247dp"
+        android:src="@drawable/ic_grupp_logo_600dp"
+        app:layout_constraintBottom_toTopOf="@+id/google_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!--</com.google.android.gms.common.SignInButton>-->
 
 
 </android.support.constraint.ConstraintLayout>
-
-
-
