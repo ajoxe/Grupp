@@ -1,30 +1,30 @@
 package com.example.c4q.capstone.userinterface.user.onboarding;
 
 
+import android.Manifest;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.example.c4q.capstone.R;
 import com.example.c4q.capstone.database.privateuserdata.PrivateUser;
 import com.example.c4q.capstone.database.privateuserdata.PrivateUserLocation;
 import com.example.c4q.capstone.database.publicuserdata.PublicUser;
-import com.example.c4q.capstone.userinterface.user.userprofilefragments.PreferencesFragment;
+import com.example.c4q.capstone.database.publicuserdata.PublicUserDetails;
+import com.example.c4q.capstone.database.publicuserdata.UserIcon;
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,9 +33,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.example.c4q.capstone.utils.Constants.DEFAULT_ICON;
 import static com.example.c4q.capstone.utils.Constants.PRIVATE_LOCATION;
 import static com.example.c4q.capstone.utils.Constants.PRIVATE_USER;
 import static com.example.c4q.capstone.utils.Constants.PUBLIC_USER;
+import static com.example.c4q.capstone.utils.Constants.USER_ICON;
 
 
 /**
@@ -46,32 +48,33 @@ public class CreateProfileFragment extends Fragment {
 
     private static final String TAG = "CreateProfileActivity";
 
-    private String userID, userEmail, firstNameString, lastNameString, zipCodeSting, budgetString;
+    private String currentUserID, firstNameString, lastNameString, zipCodeString, budgetString;
     private boolean over18, over21, share_location;
     private int radius;
     private double lat, lng;
 
-    private Button saveBtn;
+    private FloatingActionButton saveBtn;
+
     private EditText firstName, lastName, zipCode;
     private RadioGroup ageGroup, budgetGroup, radiusGroup;
     private RadioButton ageChoice, budgetChoice, radiusChoice;
 
-    private FirebaseDatabase firebaseDatabase;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseReference publicUserReference, privateUserReference, privateUserLocationReference;
-    private FirebaseUser user;
+    private DatabaseReference rootRef, publicUserReference, privateUserReference, privateUserLocationReference, userIconReference;
+    private FirebaseUser currentUser;
+    private PublicUser publicUser;
+    private UserIcon userIcon;
+    private PrivateUser privateUser;
+    private PrivateUserLocation privateUserLocation;
+    private PublicUserDetails publicUserDetails;
+    private String currentUserEmail;
+
 
     public CreateProfileFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * @Tati this is the CreateProfile fragment, basically a copy and paste of @Ashley's EditProfileCode.
-     * I've indicated when and where the fragment gets swapped with a todo.
-     * Theres a lot of code on this page. You can make it nicer,
-     * if youd like :)
-     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,7 +82,7 @@ public class CreateProfileFragment extends Fragment {
 
         rootView = inflater.inflate(com.example.c4q.capstone.R.layout.fragment_create_profile, container, false);
 
-        saveBtn = rootView.findViewById(R.id.edit_profile_save_button);
+//        saveBtn = rootView.findViewById(R.id.create_profile_save_button);
 
         ageGroup = rootView.findViewById(R.id.radio_group_age);
         budgetGroup = rootView.findViewById(R.id.radio_group_budget);
@@ -89,41 +92,28 @@ public class CreateProfileFragment extends Fragment {
         lastName = rootView.findViewById(R.id.edit_profile_lastname);
         zipCode = rootView.findViewById(R.id.edit_profile_zip_code);
 
+        rootRef = FirebaseDatabase.getInstance().getReference();
+
+        publicUserReference = rootRef.child(PUBLIC_USER);
+        privateUserReference = rootRef.child(PRIVATE_USER);
+        privateUserLocationReference = rootRef.child(PRIVATE_USER);
+        userIconReference = rootRef.child(USER_ICON);
+
         mAuth = FirebaseAuth.getInstance();
-        firebaseDatabase = FirebaseDatabase.getInstance();
 
-        publicUserReference = firebaseDatabase.getReference();
-        privateUserReference = firebaseDatabase.getReference();
-        privateUserLocationReference = firebaseDatabase.getReference();
-
-        user = mAuth.getCurrentUser();
-        userID = user.getUid();
-        userEmail = user.getEmail();
-
-        radioGroupSelection();
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Toast.makeText(CreateProfileFragment.this.getActivity(), "Successfully signed in with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                    Toast.makeText(CreateProfileFragment.this.getActivity(), "Successfully signed out.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
+        currentUser = mAuth.getCurrentUser();
+        currentUserID = currentUser.getUid();
+        currentUserEmail = currentUser.getEmail();
 
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                Log.d(TAG, "onDataChange: Added information to database: \n" +
-                        dataSnapshot.getValue());
+
+                privateUser = dataSnapshot.child(currentUserID).getValue(PrivateUser.class);
+                privateUserLocation = dataSnapshot.child(currentUserID).getValue(PrivateUserLocation.class);
+                publicUser = dataSnapshot.child(currentUserID).getValue(PublicUser.class);
+
+                Log.d(TAG, "onDataChange: Added information to database: \n" + dataSnapshot.getValue());
             }
 
             @Override
@@ -136,6 +126,27 @@ public class CreateProfileFragment extends Fragment {
         publicUserReference.addValueEventListener(valueEventListener);
         privateUserReference.addValueEventListener(valueEventListener);
         privateUserLocationReference.addValueEventListener(valueEventListener);
+        userIconReference.addValueEventListener(valueEventListener);
+
+        saveBtn = rootView.findViewById(R.id.create_profile_save_button);
+
+        radioGroupSelection();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (currentUser != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getUid());
+//                    Toast.makeText(EditProfileActivity.this, "Successfully signed in with: " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+//                    Toast.makeText(EditProfileActivity.this, "Successfully signed out.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,73 +155,57 @@ public class CreateProfileFragment extends Fragment {
             }
         });
 
-        locationManagerLogic();
-
         return rootView;
     }
 
-    public void locationManagerLogic() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(CreateProfileFragment.this.getActivity().LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(CreateProfileFragment.this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
-                (CreateProfileFragment.this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+    private void location() {
+        ///////////////////////////////////////////
+        /**
+         * code below needs to be place in the launch of the app so the user can give location
+         * permission beforehand.
+         */
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1020);
+            share_location = true;
             return;
         }
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+       /* Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         lat = location.getLatitude();
-        lng = location.getLongitude();
+        lng = location.getLongitude();*/
 
     }
 
     private void saveToDatabase() {
         firstNameString = firstName.getText().toString().trim();
         lastNameString = lastName.getText().toString().trim();
-        zipCodeSting = zipCode.getText().toString();
+        zipCodeString = zipCode.getText().toString();
+        userIcon = new UserIcon(DEFAULT_ICON);
 
-        if (!firstNameString.equals("") && !lastNameString.equals("") && !zipCodeSting.equals("")) {
-            PublicUser publicUser = new PublicUser(firstNameString, lastNameString, zipCodeSting, budgetString, userEmail, over18, over21, radius);
-            PrivateUser privateUser = new PrivateUser(firstNameString, lastNameString, over18, over21, radius);
-            PrivateUserLocation privateUserLocation = new PrivateUserLocation(share_location, lat, lng);
+        if (!firstNameString.equals("") && !lastNameString.equals("") && !zipCodeString.equals("")) {
 
-            publicUserReference.child(PUBLIC_USER).child(userID).setValue(publicUser);
-            privateUserReference.child(PRIVATE_USER).child(userID).setValue(privateUser);
-            privateUserLocationReference.child(PRIVATE_USER).child(userID).child(PRIVATE_LOCATION).setValue(privateUserLocation);
+            publicUser = new PublicUser(currentUserID, firstNameString, lastNameString, zipCodeString, budgetString, currentUserEmail, userIcon, over18, over21, radius);
 
-            //startActivity(new Intent(CreateProfileFragment.this.getActivity(), UserProfileActivity.class))
+            privateUser = new PrivateUser(firstNameString, lastNameString, over18, over21, radius);
 
-            /*****/       // TODO  @Tati - Onboarding : swap this fragment with preferences fragment
-            /** cmd + click on the method to find it and see what ti does
-             *
-             */
-            loadPreferencesScreen();
+            privateUserLocation = new PrivateUserLocation(share_location, lat, lng);
+
+            publicUserReference.child(currentUserID).setValue(publicUser);
+            privateUserReference.child(currentUserID).setValue(privateUser);
+            privateUserLocationReference.child(currentUserID).child(PRIVATE_LOCATION).setValue(privateUserLocation);
+
+            //startActivity(new Intent(CreateProfileFragment.this.getActivity(), UserProfileActivity.class));
         } else {
             firstName.setError("Required");
             lastName.setError("Required");
             zipCode.setError("Required");
         }
-    }
-
-    /**
-     * This methods gets the OnboardActivity's fragment manager and replaces this fragment with a PreferencesFragment
-     * You can easily expand you Preferences fragment to multiple, so your screens arent so busy.
-     * im pretty sure the view pager transformer requires fragments
-     * https://developer.android.com/training/animation/screen-slide.html <--- link to view pagers
-     * https://github.com/ToxicBakery/ViewPagerTransforms <---- link to view pager transformers (the cube spin thing like
-     * instagram stories)
-     */
-    private void loadPreferencesScreen() {
-
-        PreferencesFragment preferencesFragment = new PreferencesFragment();
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-        fragmentTransaction.replace(R.id.onboard_main_fragment_container, preferencesFragment);
-        fragmentTransaction.addToBackStack("next");
-        fragmentTransaction.commit();
     }
 
     @Override

@@ -1,149 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-tools:context="com.example.c4q.capstone.userinterface.user.onboarding.CreateProfileFragment">
-
-<LinearLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    tools:context="com.example.c4q.capstone.userinterface.user.onboarding.CreateProfileFragment"
+    >
 
-    <EditText
-        android:id="@+id/edit_profile_firstname"
+    <ScrollView
+        android:layout_centerInParent="true"
+        android:isScrollContainer="false"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="First Name" />
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/edit_profile_lastname"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Last Name" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <EditText
-        android:id="@+id/edit_profile_zip_code"
-        android:layout_width="match_parent"
-        android:inputType="number"
-        android:layout_height="wrap_content"
-        android:hint="Zip Code" />
+            <EditText
+                android:id="@+id/edit_profile_firstname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="First Name" />
 
-    <TextView
-        android:id="@+id/edit_profile_age_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Age" />
+            <EditText
+                android:id="@+id/edit_profile_lastname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Last Name" />
 
-    <RadioGroup
-        android:id="@+id/radio_group_age"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/edit_profile_zip_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Zip Code"
+                android:inputType="number" />
 
-        <RadioButton
-            android:id="@+id/age_choice_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="21 or over" />
+            <TextView
+                android:id="@+id/edit_profile_age_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Age" />
 
-        <RadioButton
-            android:id="@+id/age_choice_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="18 to 20" />
+            <RadioGroup
+                android:id="@+id/radio_group_age"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/age_choice_three"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="17 or younger" />
-    </RadioGroup>
+                <RadioButton
+                    android:id="@+id/age_choice_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="21 or over" />
 
-    <TextView
-        android:id="@+id/edit_profile_budget_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Budget" />
+                <RadioButton
+                    android:id="@+id/age_choice_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="18 to 20" />
 
-    <RadioGroup
-        android:id="@+id/radio_group_budget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/age_choice_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="17 or younger" />
+            </RadioGroup>
 
-        <RadioButton
-            android:id="@+id/budget_choice_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$" />
+            <TextView
+                android:id="@+id/edit_profile_budget_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Budget" />
 
-        <RadioButton
-            android:id="@+id/budget_choice_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$$" />
+            <RadioGroup
+                android:id="@+id/radio_group_budget"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/budget_choice_three"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$$$" />
+                <RadioButton
+                    android:id="@+id/budget_choice_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$" />
 
-        <RadioButton
-            android:id="@+id/budget_choice_four"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$$$$" />
-    </RadioGroup>
+                <RadioButton
+                    android:id="@+id/budget_choice_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$$" />
 
-    <TextView
-        android:id="@+id/edit_profile_radius_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Radius" />
+                <RadioButton
+                    android:id="@+id/budget_choice_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$$$" />
 
-    <RadioGroup
-        android:id="@+id/radio_group_radius"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/budget_choice_four"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$$$$" />
+            </RadioGroup>
 
-        <RadioButton
-            android:id="@+id/radius_choice_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5 mi" />
+            <TextView
+                android:id="@+id/edit_profile_radius_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Radius" />
 
-        <RadioButton
-            android:id="@+id/radius_choice_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="10 mi" />
+            <RadioGroup
+                android:id="@+id/radio_group_radius"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/radius_choice_three"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="15 mi" />
+                <RadioButton
+                    android:id="@+id/radius_choice_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 mi" />
 
-        <RadioButton
-            android:id="@+id/radius_choice_four"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="20 mi" />
+                <RadioButton
+                    android:id="@+id/radius_choice_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10 mi" />
 
-        <RadioButton
-            android:id="@+id/radius_choice_five"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="25 mi" />
-    </RadioGroup>
+                <RadioButton
+                    android:id="@+id/radius_choice_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15 mi" />
 
-    <Button
-        android:id="@+id/edit_profile_save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="Save" />
-</LinearLayout>
-</ScrollView>
+                <RadioButton
+                    android:id="@+id/radius_choice_four"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20 mi" />
+
+                <RadioButton
+                    android:id="@+id/radius_choice_five"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="25 mi" />
+            </RadioGroup>
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/create_profile_save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_forward_black_24dp"
+                app:fab_colorNormal="@color/white"
+                app:fab_stroke_visible="true" />
+
+            <!--<Button-->
+                <!--android:id="@+id/edit_profile_save_button"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:background="@color/colorPrimary"-->
+                <!--android:text="Save" />-->
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

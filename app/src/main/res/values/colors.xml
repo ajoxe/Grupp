@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#57bad5</color>
-    <color name="colorPrimaryShade">#4593a7</color>
-    <color name="colorPrimaryDark">#63c1b3</color>
-    <color name="colorAccent">#e8935c</color>
+
+    <color name="colorPrimary">#ec7b56</color>
+    <color name="colorPrimaryLight">#fabc8d</color>
+    <color name="colorPrimaryDark">#f87160</color>
+    <color name="colorPrimaryVeryDark">#f3fbfd</color>
+
+
+    <color name="colorAccent">#72c990</color>
+    <color name="colorAccentLight">#f3b792</color>
+    <color name="colorAccentDark">#b56639</color>
+    <color name="buttoncolorpressed">#92cadd</color>
+
+    <color name="colorAppGreen">#63c1b3</color>
+    <color name="colorAppGreenLight">#a1dad1</color>
+    <color name="colorAppBlue">#4ea3ed</color>
+
+    <color name="colorAppGrey">#959798</color>
+    <color name="colorAppGreyLight">#dcdcdd</color>
+    <color name="colorAppGreyDark">#5c6061</color>
+
+    <color name="colorAppMustard">#e8af28</color>
+    <color name="colorAppMustardLight">#f1cf7e</color>
+    <color name="colorAppMustardDark">#ae831e</color>
+
+
+    <color name="eventbuttonshade">#9957bad5</color>
     <color name="colorForground">#444c57</color>
     <color name="teal">#2ac0b0</color>
     <color name="dark_teal">#158e96</color>
@@ -11,10 +33,22 @@
     <color name="salmon">#f87160</color>
     <color name="light_salmon">#fabc8d</color>
     <color name="cream">#eedfa2</color>
-    <color name="light_cream">#fff9e1</color>
+    <color name="light_cream">#91fff9e1</color>
     <color name="mustard">#e8af28</color>
     <color name="light_green">#b1deb4</color>
-    <color name="colorPrimaryT">#3257bad5</color>
+    <color name="colorPrimaryT">#57bad5</color>
     <color name="hintcolor">#D3D3D3</color>
+    <color name="floatingmenucolor">#8AD3D3D3</color>
+    <color name="fabuttoncolor">#57bad5</color>
+    <color name="fabtext">#f87160</color>
+    <color name="white">#FAffffff</color>
+
+
+    <color name="indicator_1">#55B3C2</color>
+    <color name="indicator_2">#64A4A4</color>
+    <color name="indicator_3">#66D7B9</color>
+    <color name="indicator_4">#FDBC7D</color>
+    <color name="superlightcream">#ADf0d593</color>
+
 
 </resources>

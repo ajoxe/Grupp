@@ -3,9 +3,7 @@ package com.example.c4q.capstone.userinterface.user;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,13 +13,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.example.c4q.capstone.R;
 import com.example.c4q.capstone.database.privateuserdata.PrivateUser;
 import com.example.c4q.capstone.database.privateuserdata.PrivateUserLocation;
 import com.example.c4q.capstone.database.publicuserdata.PublicUser;
-import com.example.c4q.capstone.database.publicuserdata.UserSearch;
+import com.example.c4q.capstone.database.publicuserdata.UserIcon;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,12 +30,12 @@ import com.google.firebase.database.ValueEventListener;
 import static com.example.c4q.capstone.utils.Constants.PRIVATE_LOCATION;
 import static com.example.c4q.capstone.utils.Constants.PRIVATE_USER;
 import static com.example.c4q.capstone.utils.Constants.PUBLIC_USER;
-import static com.example.c4q.capstone.utils.Constants.USER_SEARCH;
+import static com.example.c4q.capstone.utils.Constants.USER_ICON;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
 
-    private String currentUserID, firstNameString, lastNameString, zipCodeSting, budgetString;
+    private String currentUserID, firstNameString, lastNameString, zipCodeString, budgetString;
     private boolean over18, over21, share_location;
     private int radius;
     private double lat, lng;
@@ -50,11 +47,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseReference rootRef, publicUserReference, privateUserReference, privateUserLocationReference, searchUserReference;
+    private DatabaseReference rootRef, publicUserReference, privateUserReference, privateUserLocationReference, userIconReference;
     private FirebaseUser currentUser;
-    private UserSearch userSearch;
     private PublicUser publicUser;
     private PrivateUser privateUser;
+    private UserIcon userIcon;
     private PrivateUserLocation privateUserLocation;
     private String currentUserEmail;
 
@@ -64,11 +61,12 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        saveBtn = findViewById(R.id.edit_profile_save_button);
+//        saveBtn = findViewById(R.id.edit_profile_save_button);
 
         ageGroup = findViewById(R.id.radio_group_age);
         budgetGroup = findViewById(R.id.radio_group_budget);
         radiusGroup = findViewById(R.id.radio_group_radius);
+        saveBtn = findViewById(R.id.edit_profile_save_button);
 
         firstName = findViewById(R.id.edit_profile_firstname);
         lastName = findViewById(R.id.edit_profile_lastname);
@@ -80,28 +78,32 @@ public class EditProfileActivity extends AppCompatActivity {
         publicUserReference = rootRef.child(PUBLIC_USER);
         privateUserReference = rootRef.child(PRIVATE_USER);
         privateUserLocationReference = rootRef.child(PRIVATE_USER);
-        searchUserReference = rootRef.child(USER_SEARCH);
+        userIconReference = rootRef.child(USER_ICON);
 
         currentUser = mAuth.getCurrentUser();
         currentUserID = currentUser.getUid();
         currentUserEmail = currentUser.getEmail();
 
-        radioGroupSelection();
+        /**
+         * write code to check if user exists in contact list of other users and then update the code
+         */
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (currentUser != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getUid());
-//                    Toast.makeText(EditProfileActivity.this, "Successfully signed in with: " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-//                    Toast.makeText(EditProfileActivity.this, "Successfully signed out.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
+        radioGroupSelection();
+//
+//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                if (currentUser != null) {
+//                    // User is signed in
+//                    Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getUid());
+////                    Toast.makeText(EditProfileActivity.this, "Successfully signed in with: " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
+//                } else {
+//                    // User is signed out
+//                    Log.d(TAG, "onAuthStateChanged:signed_out");
+////                    Toast.makeText(EditProfileActivity.this, "Successfully signed out.", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        };
 
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
@@ -109,9 +111,10 @@ public class EditProfileActivity extends AppCompatActivity {
                 privateUser = dataSnapshot.child(currentUserID).getValue(PrivateUser.class);
                 privateUserLocation = dataSnapshot.child(currentUserID).getValue(PrivateUserLocation.class);
                 publicUser = dataSnapshot.child(currentUserID).getValue(PublicUser.class);
-                userSearch = dataSnapshot.child(currentUserID).getValue(UserSearch.class);
+                userIcon = dataSnapshot.child(currentUserID).getValue(UserIcon.class);
 
                 Log.d(TAG, "onDataChange: Added information to database: \n" + dataSnapshot.getValue());
+                Log.d(TAG, "onDataChange: " + userIcon);
             }
 
             @Override
@@ -121,10 +124,10 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         };
 
-        searchUserReference.addValueEventListener(valueEventListener);
         publicUserReference.addValueEventListener(valueEventListener);
         privateUserReference.addValueEventListener(valueEventListener);
         privateUserLocationReference.addValueEventListener(valueEventListener);
+        userIconReference.addListenerForSingleValueEvent(valueEventListener);
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,15 +143,8 @@ public class EditProfileActivity extends AppCompatActivity {
          * permission beforehand.
          */
         LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        share_location = true;
 
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1020);
-            share_location = true;
-            return;
-        }
 
        /* Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         lat = location.getLatitude();
@@ -159,42 +155,27 @@ public class EditProfileActivity extends AppCompatActivity {
     private void saveToDatabase() {
         firstNameString = firstName.getText().toString().trim();
         lastNameString = lastName.getText().toString().trim();
-        zipCodeSting = zipCode.getText().toString();
+        zipCodeString = zipCode.getText().toString();
 
-        if (!firstNameString.equals("") && !lastNameString.equals("") && !zipCodeSting.equals("")) {
+        if (!firstNameString.equals("") && !lastNameString.equals("") && !zipCodeString.equals("")) {
 
-            publicUser = new PublicUser(firstNameString, lastNameString, zipCodeSting, budgetString, currentUserEmail, over18, over21, radius);
+            publicUser = new PublicUser(currentUserID, firstNameString, lastNameString, zipCodeString, budgetString, currentUserEmail, userIcon, over18, over21, radius);
+
             privateUser = new PrivateUser(firstNameString, lastNameString, over18, over21, radius);
-            privateUserLocation = new PrivateUserLocation(share_location, lat, lng);
-            userSearch = new UserSearch(currentUserEmail);
 
-            /**
-             * searchUserReference needs to be added at time of account creation
-             */
-            searchUserReference.child(currentUserID).setValue(userSearch);
+            privateUserLocation = new PrivateUserLocation(share_location, lat, lng);
+
             publicUserReference.child(currentUserID).setValue(publicUser);
             privateUserReference.child(currentUserID).setValue(privateUser);
+            userIconReference.child(currentUserID).setValue(userIcon);
             privateUserLocationReference.child(currentUserID).child(PRIVATE_LOCATION).setValue(privateUserLocation);
 
             startActivity(new Intent(EditProfileActivity.this, UserProfileActivity.class));
+
         } else {
             firstName.setError("Required");
             lastName.setError("Required");
             zipCode.setError("Required");
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 

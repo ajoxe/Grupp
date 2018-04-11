@@ -15,6 +15,9 @@ import com.example.c4q.capstone.userinterface.user.userprofilefragments.UPGroupF
 
 import org.jetbrains.annotations.NotNull;
 
+import belka.us.androidtoggleswitch.widgets.BaseToggleSwitch;
+import belka.us.androidtoggleswitch.widgets.MultipleToggleSwitch;
+import belka.us.androidtoggleswitch.widgets.ToggleSwitch;
 import io.ghyeok.stickyswitch.widget.StickySwitch;
 
 /**
@@ -26,11 +29,9 @@ public class MainProfileFragment extends Fragment {
     private UPGroupFragment groupFragment;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
+    private ToggleSwitch toggleSwitch;
 
     private View view;
-
-
-
 
 
     public MainProfileFragment() {
@@ -42,24 +43,43 @@ public class MainProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view =  inflater.inflate(R.layout.profile_main_frag, container, false);
+        view = inflater.inflate(R.layout.profile_main_frag, container, false);
         setFragmentReference();
         loadFirstFragment();
 
-        final StickySwitch stickySwitch = view.findViewById(R.id.sticky_switch);
-        stickySwitch.setOnSelectedChangeListener(new StickySwitch.OnSelectedChangeListener() {
+        toggleSwitch = view.findViewById(R.id.toogle_bar);
+
+
+
+        toggleSwitch.setOnToggleSwitchChangeListener(new ToggleSwitch.OnToggleSwitchChangeListener(){
+
             @Override
-            public void onSelectedChange(@NotNull StickySwitch.Direction direction, @NotNull String text) {
-                if (stickySwitch.getDirection() == StickySwitch.Direction.RIGHT) {
-//                    Toast.makeText(activity, "Direction " + stickySwitch.getDirection(), Toast.LENGTH_SHORT).show();
+            public void onToggleSwitchChangeListener(int position, boolean isChecked) {
+
+                if (toggleSwitch.getCheckedTogglePosition() == 1){
                     swapFragments(groupFragment);
-                } else if (stickySwitch.getDirection() == StickySwitch.Direction.LEFT){
-//                    Toast.makeText(activity, "Direction "+ stickySwitch.getDirection(), Toast.LENGTH_SHORT).show();
+                } else{
                     swapFragments(eventsFragment);
                 }
+                // Write your code ...
             }
-
         });
+
+//        final StickySwitch stickySwitch = view.findViewById(R.id.sticky_switch);
+//        stickySwitch.setOnSelectedChangeListener(new StickySwitch.OnSelectedChangeListener() {
+//            @Override
+//            public void onSelectedChange(@NotNull StickySwitch.Direction direction, @NotNull String text) {
+//                if (stickySwitch.getDirection() == StickySwitch.Direction.RIGHT) {
+////                    Toast.makeText(activity, "Direction " + stickySwitch.getDirection(), Toast.LENGTH_SHORT).show();
+//                    swapFragments(groupFragment);
+//                } else if (stickySwitch.getDirection() == StickySwitch.Direction.LEFT){
+////                    Toast.makeText(activity, "Direction "+ stickySwitch.getDirection(), Toast.LENGTH_SHORT).show();
+//                    swapFragments(eventsFragment);
+//                }
+//            }
+//
+//        });
+
 
         return view;
     }
@@ -79,7 +99,6 @@ public class MainProfileFragment extends Fragment {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.up_bottom_frag_cont, fragment).commit();
     }
-
 
 
 }

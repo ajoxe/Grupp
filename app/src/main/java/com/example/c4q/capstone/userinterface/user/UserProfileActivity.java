@@ -4,41 +4,45 @@ package com.example.c4q.capstone.userinterface.user;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.SupportActivity;
-
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-import com.example.c4q.capstone.LoginActivity;
+
 import com.example.c4q.capstone.R;
 import com.example.c4q.capstone.TempUserActivity;
+import com.example.c4q.capstone.database.events.UserEvent;
 import com.example.c4q.capstone.userinterface.CurrentUser;
+import com.example.c4q.capstone.userinterface.alerts.InviteNotifications;
 import com.example.c4q.capstone.userinterface.events.createevent.CreateEventActivity;
+import com.example.c4q.capstone.userinterface.user.onboarding.CreateProfileFragment;
+import com.example.c4q.capstone.userinterface.user.onboarding.OnBoardActivity;
 import com.example.c4q.capstone.userinterface.user.search.UserSearchActivity;
-import com.example.c4q.capstone.userinterface.user.userprofilefragments.UPEventsFragment;
-import com.example.c4q.capstone.userinterface.user.userprofilefragments.UPGroupFragment;
+
+import com.example.c4q.capstone.userinterface.user.userprofilefragments.UPCreateGroupFragment;
 import com.example.c4q.capstone.userinterface.user.userprofilefragments.fragmentanimation.ScreenSlidePagerAdapter;
+import com.example.c4q.capstone.LoginActivity;
+import com.example.c4q.capstone.utils.currentuser.CurrentUserUtility;
+import com.example.c4q.capstone.utils.currentuser.UserEventListener;
 import com.firebase.ui.auth.AuthUI;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
-
-import org.jetbrains.annotations.NotNull;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-import io.ghyeok.stickyswitch.widget.StickySwitch;
+import java.util.Map;
 
 
 public class UserProfileActivity extends AppCompatActivity {
@@ -46,15 +50,25 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     private Toolbar toolbar;
-    private FloatingActionButton floatingActionButton;
+    //    private FloatingActionButton floatingActionButton;
+    private FloatingActionMenu floatingActionMenu;
+    private FloatingActionButton creatEvent, addPerson;
     private Context context;
     private Activity activity;
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListner;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
 
-    private CurrentUser currentUserInstance = CurrentUser.getInstance();
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mAuth.addAuthStateListener(mAuthListner);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +78,7 @@ public class UserProfileActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mAuth = FirebaseAuth.getInstance();
 
         mPager = findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -72,27 +87,65 @@ public class UserProfileActivity extends AppCompatActivity {
         context = this;
         activity = this;
 
-
-
-
-
-        floatingActionButton = findViewById(R.id.floatingactionb);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        floatingActionMenu = findViewById(R.id.floatingaction_menu);
+        floatingActionMenu.setClosedOnTouchOutside(true);
+        creatEvent = findViewById(R.id.create_event_mini);
+        creatEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(UserProfileActivity.this, CreateEventActivity.class));
             }
         });
+        addPerson = findViewById(R.id.add_group_mini);
+        addPerson.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //startActivity(new Intent(UserProfileActivity.this, AddPersonActivity.class));
+                UPCreateGroupFragment upCreateGroupFragment = new UPCreateGroupFragment();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.addToBackStack("Grupp Details Fragment").replace(R.id.drawer_layout, upCreateGroupFragment);
+                fragmentTransaction.commit();
+
+            }
+        });
 
 
-
+        mAuthListner = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (mAuth.getCurrentUser() == null) {
+                    startActivity(new Intent(UserProfileActivity.this, LoginActivity.class));
+                }
+            }
+        };
+        pushEventInviteNotifications();
+        //new InviteNotifications("test", "notification", getApplicationContext());
 
 
     }
 
+    public void pushEventInviteNotifications() {
+        final Context mContext = getApplicationContext();
+        CurrentUserUtility currentUserUtility = new CurrentUserUtility();
+        currentUserUtility.getSingleEventInviteList(CurrentUser.userID, new UserEventListener() {
+            @Override
+            public void getUserEventList(Map<String, UserEvent> userEventMap) {
+
+                if (userEventMap != null && userEventMap.size() != 0) {
+                    Log.d(TAG, "notifications not null");
+
+                    new InviteNotifications("You're Invited!", "you have new events", getApplicationContext(), null);
+
+                } else {
+                    Log.d(TAG, "notifications null");
+                }
+            }
+        });
 
 
-
+        //
+    }
 
 
     @Override
@@ -106,32 +159,13 @@ public class UserProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.edit_profile_menu_item:
-                startActivity(new Intent(UserProfileActivity.this, EditProfileActivity.class));
-                break;
+
             case R.id.edit_preferences_menu_item:
                 //TODO
-
                 startActivity(new Intent(UserProfileActivity.this, TempUserActivity.class));
-
-                break;
-            case R.id.add_friends_menu_item:
-                startActivity(new Intent(UserProfileActivity.this, UserSearchActivity.class));
-                break;
-//            case R.id.add_group_menu_item:
-//                startActivity(new Intent(UserProfileActivity.this, CreateEventActivity.class));
-//                //TODO
-//                break;
-            case R.id.signout_menu_item:
-                AuthUI.getInstance().signOut(this);
-                startActivity(new Intent(UserProfileActivity.this, LoginActivity.class));
-
-
-                //TODO
                 break;
         }
-        return super.onOptionsItemSelected(item);
+            return super.onOptionsItemSelected(item);
     }
-
 
 }

@@ -1,54 +1,69 @@
 package com.example.c4q.capstone.userinterface.user.userprofilefragments.userprofilecontroller;
 
-import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import com.example.c4q.capstone.R;
+import com.bumptech.glide.Glide;
 import com.example.c4q.capstone.database.publicuserdata.PublicUser;
+import com.example.c4q.capstone.database.publicuserdata.PublicUserDetails;
+import com.example.c4q.capstone.database.publicuserdata.UserIcon;
 import com.example.c4q.capstone.userinterface.user.userprofilefragments.userprofileviews.ContactListViewHolder;
-import com.example.c4q.capstone.userinterface.user.userprofilefragments.userprofileviews.GroupViewHolder;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import static com.example.c4q.capstone.utils.Constants.PUBLIC_USER;
+import static com.example.c4q.capstone.utils.Constants.USER_ICON;
 
 /**
  * Created by melg on 3/20/18.
  */
 
-public class ContactListAdapter extends RecyclerView.Adapter<ContactListViewHolder>{
+public class ContactListAdapter extends FirebaseRecyclerAdapter<PublicUserDetails, ContactListViewHolder> {
+    DatabaseReference rootRef, iconRef, userName;
 
-    List<PublicUser> userPublicList = new ArrayList<>();
-    Context context;
-
-
-    public ContactListAdapter(){
-
-    }
-
-    public  ContactListAdapter(List<PublicUser> randomNumberList, Context context){
-            this.context = context;
-            this.userPublicList = randomNumberList;
+    public ContactListAdapter(Class<PublicUserDetails> modelClass, int modelLayout, Class<ContactListViewHolder> viewHolderClass, Query ref) {
+        super(modelClass, modelLayout, viewHolderClass, ref);
     }
 
     @Override
-    public ContactListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.contact_item_view, parent, false);
-        return new ContactListViewHolder(view);
-    }
+    protected void populateViewHolder(final ContactListViewHolder viewHolder, PublicUserDetails model, int position) {
+        String contactID = getRef(position).getKey();
 
-    @Override
-    public void onBindViewHolder(ContactListViewHolder holder, int position) {
+        rootRef = FirebaseDatabase.getInstance().getReference();
+        iconRef = rootRef.child(USER_ICON).child(contactID);
+        userName = rootRef.child(PUBLIC_USER).child(contactID);
 
-        // using a dummy list to make sure the contacts will show;
+        iconRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UserIcon userIcon = dataSnapshot.getValue(UserIcon.class);
+                String url = userIcon.getIcon_url();
+                viewHolder.setUserIcon(url);
+            }
 
-        holder.onBind(userPublicList.get(position));
-    }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
-    @Override
-    public int getItemCount() {
-        return userPublicList.size();
+        userName.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                PublicUser publicUser = dataSnapshot.getValue(PublicUser.class);
+                String first = publicUser.getFirst_name();
+                String last = publicUser.getLast_name();
+                String email = publicUser.getEmail();
+                viewHolder.setName(first, last);
+                viewHolder.setEmail(email);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
