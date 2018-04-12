@@ -89,7 +89,7 @@ public class TempUserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //startActivity(new Intent(TempUserActivity.this, OnBoardActivity.class));
-                startActivity(new Intent(TempUserActivity.this, EditProfileActivity.class));
+                startActivity(new Intent(TempUserActivity.this, OnBoardActivity.class));
 
             }
         });
@@ -196,9 +196,13 @@ public class TempUserActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 PublicUser publicUser = dataSnapshot.getValue(PublicUser.class);
                 StringBuilder sb = new StringBuilder();
-                sb.append(publicUser.getFirst_name());
+                if (publicUser.getFirst_name() != null){
+                    sb.append(publicUser.getFirst_name());
+                }
                 sb.append(" ");
-                sb.append(publicUser.getLast_name());
+                if (publicUser.getLast_name() != null){
+                    sb.append(publicUser.getLast_name());
+                }
                 personName.setText(sb.toString());
             }
 
