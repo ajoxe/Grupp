@@ -156,6 +156,9 @@ public class CurrentUserPostUtility {
     public void updateVenueVoteCount(String eventKey, String venueKey, int voteCount){
         eventsReference.child(eventKey).child(VENUE_MAP).child(venueKey).child(VENUE_VOTE_COUNT).setValue(voteCount);
     }
+    public void updateVenueVoteComplete(String eventKey,boolean voteComplete){
+        eventsReference.child(eventKey).child("vote_complete").setValue(voteComplete);
+    }
     public void updateEventGuest(String eventKey, String userId, EventGuest eventGuest){
         eventsReference.child(eventKey).child(EVENT_GUEST_MAP).child(userId).setValue(eventGuest);
     }
@@ -191,5 +194,9 @@ public class CurrentUserPostUtility {
                 eventInvitesReference.child(s).child(eventKey).child("event_photo").setValue(photoUrl);
             }
         }
+    }
+
+    public void updateGuestStatus(String eventKey, String status, String userId){
+        eventsReference.child(eventKey).child(EVENT_GUEST_MAP).child(userId).child("user_status").setValue(status);
     }
 }

@@ -70,6 +70,9 @@ public class CurrentUserPost {
     public void postVenueVoteCount(String eventKey, String venueKey, int voteCount){
         userPostUtility.updateVenueVoteCount(eventKey,venueKey, voteCount);
     }
+    public void postVenueVoteComplete(String eventKey, boolean voteComplete){
+        userPostUtility.updateVenueVoteComplete(eventKey,voteComplete);
+    }
     public void postEventGuest(String eventKey, String userId, EventGuest eventGuest){
         userPostUtility.updateEventGuest(eventKey,userId, eventGuest);
     }
@@ -78,6 +81,9 @@ public class CurrentUserPost {
     }
     public void postTopVenue(String eventKey, String venueId, String photoUrl, Events events){
         userPostUtility.updateTopVenue(eventKey, venueId, photoUrl, events);
+    }
+    public void postStatus(String eventKey, String status, String userID){
+        userPostUtility.updateGuestStatus(eventKey, status, userID);
     }
 
     public void deleteEvent (Events events){
