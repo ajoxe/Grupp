@@ -44,7 +44,7 @@ public class VenueNetworkUtility {
         if(eventGuests != null){
             Log.d(TAG, "venue util eventGuests" + eventGuests.size());
             eventGuests.add(CurrentUser.getInstance().getCurrentPublicUser());
-            String preferences = "lounge";
+            String preferences = "lounge";//TODO: get prefs list from firebase, format to string, spaces with no commas
             final int callCount = eventGuests.size();
             for (PublicUser guest: eventGuests){
 
